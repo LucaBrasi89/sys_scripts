@@ -1,5 +1,5 @@
 #! /usr/bin/python3
-from subprocess import check_output, call, DEVNULL
+from subprocess import check_output, call, DEVNULL, getoutput, CalledProcessError, getstatusoutput
 from os.path import exists
 from os import remove
 from datetime import datetime
@@ -19,13 +19,11 @@ import re
 #    
 
 
-locDirs = ["/media/Maindata/Книги/",
-           "/media/Maindata/Дело/",
-	   "/media/Maindata/install/"]
+locDirs = ["/media/Maindata/Книги/", 
+           "/media/Maindata/Дело/"]
 
 remDirs = ["/Root/Книги/",
-           "/Root/Дело/",
-	   "/Root/install/"]
+           "/Root/Дело/"]
 
 # log location
 log = "/var/log/megasync.log"                     
@@ -42,6 +40,7 @@ if(exists(logTmp)):
 for i in range(len(locDirs)):
     locDir = locDirs[i]
     remDir = remDirs[i]
+    absentFiles = "" 
     
     # --- create directory on cloud drive if not exist
     dirExisted = check_output("megals {0} {1} | wc -l".format(id, remDir), shell=True, universal_newlines=True)
@@ -49,34 +48,41 @@ for i in range(len(locDirs)):
     if (int(dirExisted) == 0):
         call('''megamkdir {0} "{1}"'''.format(id, remDir), shell=True, stderr=DEVNULL)    
 
-    # --- delete localy absent files and directories from cloud drive																		
-    absentFiles = check_output("megacopy {0} --dryrun --reload --download --local \"{1}\" --remote \"{2}\"".format(id,
-				locDir, remDir), shell=True, universal_newlines=True, stderr=DEVNULL)
-
+    #   STAGE 1
+    # --- delete localy absent files and directories from cloud drive																
+    print("\nSTAGE 1/3 for folder " + locDir + ".....\n")
+    absentFiles = getoutput("megacopy {0} --dryrun --reload --download --local \"{1}\" --remote \"{2}\" 2>/dev/null".format(id, 
+                               locDir, remDir))
 
     for elem in absentFiles.split("\n"):
+        # removing extrenerous in begin, D /path/to/file
         try:
-            # removing extrenerous in begin, D /path/to/file
             elem = re.search(r'/.*$',elem).group()
             elem = elem.replace(locDir, remDir)
-            call("megarm {0} \"{1}\"".format(id, elem), shell=True, stderr=DEVNULL)
-        except Exception:
-            print(elem)
+            call("megarm {0} \"{1}\"".format(id, elem), shell=True)
+        except AttributeError:
+            pass
 
-
+    #   STAGE 2
     # --- delete localy modified files from cloud drive...
+
+    print("STAGE 2/3.....\n")
     if(exists(log)):
         # ...using log modification as criterion
         modifiedFiles = check_output("find \"{0}\" -type f -newer \"{1}\"".format(locDir, log), shell=True, universal_newlines=True);
         for elem in modifiedFiles.split("\n"):
             elem = elem.replace(locDir, remDir)
-            check_output("megarm {0} \"{1}\"".format(id, elem), shell=True, stderr=DEVNULL)
+            getstatusoutput("megarm {0} \"{1}\"".format(id, elem))
 
 
+    #   STAGE 3
     # --- sync local data
-    sync = check_output("megacopy --no-progress {0} --local \"{1}\" --remote \"{2}\"".format(id, locDir, remDir), shell=True, universal_newlines=True, stderr=DEVNULL)
-    syncToLog = sync.replace(remDir, locDir)
 
+    print("STAGE 3/3.....\n")
+ 
+    sync = getstatusoutput("megacopy --no-progress {0} --local \"{1}\" --remote \"{2}\" 2>/dev/null ".format(id,
+                        locDir, remDir))[1]
+    syncToLog = sync.replace(remDir, locDir)
 
 
     #getting current time

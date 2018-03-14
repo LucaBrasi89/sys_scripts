@@ -1,4 +1,4 @@
 sh_scripts /media/Maindata/Дело/das_code/ sh /media/Maindata/.backup/
 py_scripts /media/Maindata/Дело/das_code/ py /media/Maindata/.backup/
 java /media/Maindata/Дело/das_code/ java /media/Maindata/.backup/
-rednotebook /home/andrew/.rednotebook/data/ andrew /media/Maindata/.backup/
+rednotebook /home/andrew/ .rednotebook /media/Maindata/.backup/

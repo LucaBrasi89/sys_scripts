@@ -41,7 +41,7 @@ class View:
 #   Запускает PDF файл, а потом закрывает окно    
     def openPDF(self):
         fullpath=self.path+self.chosenPDF
-        subprocess.call('evince '+fullpath,shell=True)
+        subprocess.call('okular '+fullpath,shell=True)
         self.root.quit()
         self.root.withdraw()
         delattr(self, 'root') 

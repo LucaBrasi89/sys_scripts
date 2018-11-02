@@ -11,7 +11,7 @@
 
 import os,re, time, sys
 from subprocess import *
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 
 # Открывает исходный файл и возващает его в реверсированном порядке.
 # Принимает аргументы: filename - путь к файлу, replace=True - заменит
@@ -113,9 +113,9 @@ class getInfo():
         self.days=days_difference
 
         # Окошко warnings
-class DrawWarning(QtGui.QWidget):
+class DrawWarning(QtWidgets.QWidget):
     def __init__(self,days, parent=None,):
-        QtGui.QWidget.__init__(self, parent)
+        QtWidgets.QWidget.__init__(self, parent)
 
         self.setGeometry(960, 540, 300, 150)
         self.setWindowTitle('printer')
@@ -123,19 +123,20 @@ class DrawWarning(QtGui.QWidget):
         font.setPointSize(14)
         self.setFont(font)
 
-        button_ok=QtGui.QPushButton('OK',self)
+        button_ok=QtWidgets.QPushButton('OK',self)
 
         button_ok.setFixedSize(100,40)
-        self.connect(button_ok,QtCore.SIGNAL('clicked()'),QtGui.qApp,
-                     QtCore.SLOT('quit()'))
-        label=QtGui.QLabel('You don\'t print for a {0} '
+
+        button_ok.clicked.connect(self.close)
+
+        label=QtWidgets.QLabel('You don\'t print for a {0} '
               'days'.format(days))
-        label2=QtGui.QLabel()
+        label2=QtWidgets.QLabel()
         pixmap=QtGui.QPixmap('/usr/share/icons/Adwaita/48x48/status/' \
                              'dialog-warning.png')
         label2.setPixmap(pixmap)
 
-        grid=QtGui.QGridLayout()
+        grid=QtWidgets.QGridLayout()
         grid.setSpacing(10)
         grid.setVerticalSpacing(20)
         grid.addWidget(label2,0,0,QtCore.Qt.AlignHCenter)
@@ -147,7 +148,7 @@ class DrawWarning(QtGui.QWidget):
         # Центрирует окно
     def center(self):
 
-        screen = QtGui.QDesktopWidget().screenGeometry()
+        screen = QtWidgets.QDesktopWidget().screenGeometry()
         size = self.geometry()
         self.move((screen.width()-size.width())/2, (screen.height()-
         size.height())/2)
@@ -156,7 +157,7 @@ class DrawWarning(QtGui.QWidget):
 class DrawCritical(DrawWarning):
 
     def __init__(self,days, parent=None,):
-        QtGui.QWidget.__init__(self, parent)
+        QtWidgets.QWidget.__init__(self, parent)
 
         self.setGeometry(960, 540, 300, 150)
         self.setWindowTitle('printer')
@@ -164,19 +165,18 @@ class DrawCritical(DrawWarning):
         font.setPointSize(14)
         self.setFont(font)
 
-        button_ok=QtGui.QPushButton('OK',self)
+        button_ok=QtWidgets.QPushButton('OK',self)
 
         button_ok.setFixedSize(100,40)
-        self.connect(button_ok,QtCore.SIGNAL('clicked()'),QtGui.qApp,
-                     QtCore.SLOT('quit()'))
-        label=QtGui.QLabel('You don\'t print for a {0} '
+        button_ok.clicked.connect(self.close)
+        label=QtWidgets.QLabel('You don\'t print for a {0} '
               'days.\n       Do it immediately!'.format(days))
-        label2=QtGui.QLabel()
+        label2=QtWidgets.QLabel()
         pixmap=QtGui.QPixmap('/usr/share/icons/Adwaita/48x48/' \
                              'status/dialog-error.png')
         label2.setPixmap(pixmap)
 
-        grid=QtGui.QGridLayout()
+        grid=QtWidgets.QGridLayout()
         grid.setSpacing(10)
         grid.setVerticalSpacing(20)
         grid.addWidget(label2,0,0,QtCore.Qt.AlignHCenter)
@@ -194,8 +194,8 @@ if __name__ == "__main__":
     b.getPrLastDate()
     days=b.days
 
-    app = QtGui.QApplication(sys.argv)
-    if days >=3 and days <7:
+    app = QtWidgets.QApplication(sys.argv)
+    if days >= 3 and days <7:
         qb = DrawWarning(days)
     elif days >= 7:
         qb = DrawCritical(days)

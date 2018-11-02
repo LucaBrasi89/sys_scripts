@@ -4,13 +4,11 @@
 #        by Andrew Sotnikov aka Luca Brasi,
 #        e-mail: andrew.sotnikov@zoho.com
 #        --------------
-
-#      sudo apt-get install python3-pip
-#      sudo pip3 install PyMySQL
+#      
+#   
 #      sudo cp saumysql.py /usr/lib/python3/dist-packages/saumysql.py
 
-import  sys, pymysql
-
+import  sys, mysql.connector  
 class Crud():
 
     sql='' #SQl запрос
@@ -18,18 +16,23 @@ class Crud():
     def __init__(self,host,user,passwd,dbname):
 
         #Подсодинение в БД
-        self.db=pymysql.connect(host,user,passwd,dbname)
-        self.db.set_charset('utf8')
+        self.db = mysql.connector.connect(user=user,
+                                          password = passwd,
+                                          host = host,
+                                          database = dbname)
 
     def createAct(self):
 
         # prepare a cursor object using cursor() method
         cursor = self.db.cursor()
         try:
+            
             cursor.execute(self.sql)
             self.db.commit()
         except:
+            
             print("Что-то пошло не так, метод create fail!")
+            print(self.sql)
             self.db.rollback()
 
     def readAct(self):

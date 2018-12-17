@@ -47,13 +47,13 @@ class ReverseFile:
 
 class getInfo():
 
-    year={'янв':31,'фев':29,'мар':31,
-          'апр':30,'май':31,'июн':30,
-          'июл':31,'авг':31,'сен':30,
-          'окт':31,'ноя':30,'дек':31}
+    year={'jan':31,'feb':28,'mar':31,
+          'apr':30,'may':31,'jun':30,
+          'jul':31,'aug':31,'sep':30,
+          'oct':31,'nov':30,'dec':31}
 
-    month=('янв','фев','мар','апр','май','июн',
-           'июл','авг','сен','окт','ноя','дек')
+    month=('jan','feb','mar','apr','may','jun',
+           'jul','aug','sep','oct','nov','dec')
 
     # Вызывает lpstat -d и парсит вывод.
     # Возвращает дефолтный имя дефолтного принтера.
@@ -79,38 +79,37 @@ class getInfo():
 
 
     # Получает строку формата:
-    # Canon_E464-114 andrew  18432 Пнд 01 Фев 2016 21:06:54
+    # Canon_E464-5            andrew          133120   Wed Dec 12 18:19:41 2018
     # Парсит string и возврщает список date, такого формата:
-    # ('01', 'фев', '2016')
-
+    # ('Dec', '12', '2018')
     def parseDate(self,string):
-        # date=re.search(r'.{11}\s(?=\d{2}:\d{2}:\d{2})',string)
-        date=re.search(r'.(\d{2})\s(.{3})\s(\d{4})\s(?=\d{2}:\d{2}:\d{2})',
+        date=re.search(r'(.{3})\s(\d{2})\s(.{8})\s([0-9]{4})',
                        string)
-        date=date.group(1,2,3)
+        date=date.group(1,2,4)
         print(date)
         return date
 
     # Получает количество дней с момента последнего запуска принтера и
     # возвращает это значение.
+    # mm-dd-YYYY
     def getDifference(self,date):
 
         # Начало получения количества дней с момента последнего запуска
         d_from_last=0
         for x in self.month:
-            if date[1].lower() in x:
-                d_from_last=d_from_last+int(date[0])
+            if date[0].lower() in x:
+                d_from_last = d_from_last + int(date[1])
                 break
-            d_from_last=d_from_last+self.year[x]
+            d_from_last = d_from_last + self.year[x]
         # Конец получения количества дней с момента последнего запуска
 
         doy=int(time.strftime('%j',time.gmtime()))
         year=int(time.strftime('%Y',time.gmtime()))
         if (int(date[2])) != year:
-            doy=doy+365
-        days_difference=doy-d_from_last
+            doy = doy + 365
+        days_difference = doy - d_from_last
         print('Печать не проводилась {0} дней'.format(days_difference))
-        self.days=days_difference
+        self.days = days_difference
 
         # Окошко warnings
 class DrawWarning(QtWidgets.QWidget):
@@ -132,7 +131,7 @@ class DrawWarning(QtWidgets.QWidget):
         label=QtWidgets.QLabel('You don\'t print for a {0} '
               'days'.format(days))
         label2=QtWidgets.QLabel()
-        pixmap=QtGui.QPixmap('/usr/share/icons/Adwaita/48x48/status/' \
+        pixmap=QtGui.QPixmap('/usr/share/icons/oxygen/base/48x48/status/' \
                              'dialog-warning.png')
         label2.setPixmap(pixmap)
 
@@ -172,7 +171,7 @@ class DrawCritical(DrawWarning):
         label=QtWidgets.QLabel('You don\'t print for a {0} '
               'days.\n       Do it immediately!'.format(days))
         label2=QtWidgets.QLabel()
-        pixmap=QtGui.QPixmap('/usr/share/icons/Adwaita/48x48/' \
+        pixmap=QtGui.QPixmap('/usr/share/icons/oxygen/base/48x48/' \
                              'status/dialog-error.png')
         label2.setPixmap(pixmap)
 
@@ -195,7 +194,7 @@ if __name__ == "__main__":
     days=b.days
 
     app = QtWidgets.QApplication(sys.argv)
-    if days >= 3 and days <7:
+    if days >= 3 and days < 7:
         qb = DrawWarning(days)
     elif days >= 7:
         qb = DrawCritical(days)

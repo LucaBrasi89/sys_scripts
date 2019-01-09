@@ -83,7 +83,7 @@ class getInfo():
     # Парсит string и возврщает список date, такого формата:
     # ('Dec', '12', '2018')
     def parseDate(self,string):
-        date=re.search(r'(.{3})\s(\d{2})\s(.{8})\s([0-9]{4})',
+        date=re.search(r'(.{3})\s{1,}(\d{,2})\s{1,}(.{8})\s([0-9]{4})$',
                        string)
         date=date.group(1,2,4)
         print(date)

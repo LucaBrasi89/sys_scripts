@@ -148,7 +148,3 @@ if __name__ == "__main__":
                                                                                    devices[i-1].index), 
                                           shell=True, universal_newlines=True)
             
-            
-            
-            
-#                                                                          
